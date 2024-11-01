@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomeScreenView: View {
 	
-	@StateObject var weatherVM : WeatherViewModel = WeatherViewModel()
+	@StateObject var weatherVM : WeatherViewModel = WeatherViewModel(httpClient: HttpClient())
 	
     var body: some View {
 		ZStack{
@@ -32,7 +32,10 @@ struct HomeScreenView: View {
 					Spacer()
 				}
 				
-			}.alert("Error", isPresented: $weatherVM.showError, presenting: weatherVM.errorMessage) { errorMessage in
+			}.onAppear(perform: {
+				self.weatherVM.fetchWeatherInfo()
+			})
+			.alert("Error", isPresented: $weatherVM.showError, presenting: weatherVM.errorMessage) { errorMessage in
 				Button("Retry", role: .cancel) {
 					weatherVM.fetchWeatherInfo()
 				
@@ -45,6 +48,6 @@ struct HomeScreenView: View {
 }
 
 #Preview {
-	HomeScreenView(weatherVM: WeatherViewModel())
+	HomeScreenView(weatherVM: WeatherViewModel(httpClient: HttpClient()))
 }
 

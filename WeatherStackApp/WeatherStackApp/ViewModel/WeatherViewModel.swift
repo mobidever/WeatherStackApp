@@ -22,22 +22,38 @@ class WeatherViewModel : ObservableObject {
 	
 	private var weatherModelCancellable = Set<AnyCancellable>()
 	@Published var searchText = ""
+	private let httpClient: NetworkClient
 	
-	init() {
-		self.fetchWeatherInfo()
+//	init() {
+//		self.fetchWeatherInfo()
+//	}
+	
+	init(httpClient: NetworkClient){
+		self.httpClient = httpClient
+		
 	}
 	
 	func temperatureFormatInDegrees(weatherInfo: CurrentWeatherInfo) -> String {
 		return "\(weatherInfo.temperature)°C"
 	}
 	
+	/*
+	 Method to return weatherInfoPublisher, which takes input as json
+	 */
+	func weatherPublisher(for location:String) -> AnyPublisher<Data,Error> {
+		
+		self.httpClient.fetchData(from: Urls.weatherInfoURL(for: "Mumbai"))
+			.receive(on: RunLoop.main)
+			.eraseToAnyPublisher()
+	}
+
 	func fetchWeatherInfo() {
+
 		self.isLoading = true
-		HttpClient().fetchData(from: Urls.weatherInfoURL(for: "Mumbai"))
-					.receive(on: RunLoop.main)
+		
+		self.weatherPublisher(for: "Mumbai")
 					.decode(type: WeatherModel.self, decoder: JSONDecoder())
 					.sink(receiveCompletion: { [weak self] (completion) in
-						
 						self?.isLoading = false
 						switch completion {
 							case .finished:

@@ -1,0 +1,13 @@
+{
+	"location": {
+		"name": "Hyderabad",
+		"country": "India",
+		"region": "Telangana",
+	},
+	"current": {
+		"temperature": 28,
+		"wind_speed": 6,
+		"wind_degree": 122,
+		"wind_dir": "ESE",
+	}
+}
