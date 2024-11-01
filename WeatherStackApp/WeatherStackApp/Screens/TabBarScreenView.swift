@@ -36,7 +36,7 @@ extension TabScreenView {
 			case .home:
 				NavigationStack{
 					HomeScreenView()
-				}
+				}.navigationTitle(Text("WeatherStackApp"))
 			case .about:
 				NavigationStack{
 					AboutScreenView()

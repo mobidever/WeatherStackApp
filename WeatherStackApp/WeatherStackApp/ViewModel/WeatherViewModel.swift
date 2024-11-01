@@ -25,7 +25,6 @@ class WeatherViewModel : ObservableObject {
 
 	init(httpClient: NetworkClient){
 		self.httpClient = httpClient
-		
 	}
 	
 	func temperatureFormatInDegrees(weatherInfo: CurrentWeatherInfo) -> String {
@@ -43,32 +42,57 @@ class WeatherViewModel : ObservableObject {
 	}
 
 	func fetchWeatherInfo(for location:String) {
-
 		self.isLoading = true
-		
-		self.weatherPublisher(for: location)
-					.decode(type: WeatherModel.self, decoder: JSONDecoder())
-					.sink(receiveCompletion: { [weak self] (completion) in
-						self?.isLoading = false
-						switch completion {
-							case .finished:
-								print("Call invoke Finished")
-							case .failure(let error):
-								self?.showError = true
-								self?.errorMessage = error.localizedDescription
-								print("Call invoke Failed with error: \(error.localizedDescription)")
-						}
-						
-					}, receiveValue: { [weak self] (weatherModel) in
-						
-						self?.isLoading = false
-						print(weatherModel.location.name)
-						self?.temperature = self?.temperatureFormatInDegrees(weatherInfo: weatherModel.current) ?? "Unknown"
-						self?.city = weatherModel.location.name
-						self?.region = weatherModel.location.region
-						self?.windDirection =  "\(weatherModel.current.wind_dir)"
-						
-					}).store(in: &weatherModelCancellable)
+		if ProcessInfo.processInfo.arguments.contains("MOCK_VIEWMODEL_DATA_LOADED") {
+			self.isLoading = false
+			self.city = "Mumbai"
+			self.region = "Maharasthra"
+			let mockWeatherInfo = CurrentWeatherInfo(temperature: 24, wind_dir: "SE", wind_degree: 25)
+			self.temperature = self.temperatureFormatInDegrees(weatherInfo: mockWeatherInfo)
+			self.windDirection = "SE"
+		}else if ProcessInfo.processInfo.arguments.contains("MOCK_VIEWMODEL_DATA_LOADING_FAILURE") {
+			
+			Fail<WeatherModel, Error>(error: URLError(.badServerResponse))
+				.delay(for: .seconds(1), scheduler: RunLoop.main) // lets say there is a delay in  loading due to low network signal
+				.sink(receiveCompletion: { [weak self] completion in
+					self?.isLoading = false
+					switch completion {
+						case .finished:
+							print("Call Invoke finished in Mock Datat Failure Loading Case")
+						case .failure(let error):
+							self?.showError = true
+							self?.errorMessage = error.localizedDescription
+					}
+				}, receiveValue: { _ in })
+				.store(in: &weatherModelCancellable)
+		}
+		else {
+			
+			self.weatherPublisher(for: location)
+				.decode(type: WeatherModel.self, decoder: JSONDecoder())
+				.sink(receiveCompletion: { [weak self] (completion) in
+					self?.isLoading = false
+					switch completion {
+						case .finished:
+							print("Call invoke Finished")
+						case .failure(let error):
+							self?.showError = true
+							self?.errorMessage = error.localizedDescription
+							print("Call invoke Failed with error: \(error.localizedDescription)")
+					}
+					
+				}, receiveValue: { [weak self] (weatherModel) in
+					
+					self?.isLoading = false
+					print(weatherModel.location.name)
+					self?.temperature = self?.temperatureFormatInDegrees(weatherInfo: weatherModel.current) ?? "--"
+					self?.city = weatherModel.location.name
+					self?.region = weatherModel.location.region
+					self?.windDirection =  "\(weatherModel.current.wind_dir)"
+					
+				}).store(in: &weatherModelCancellable)
+
+		}
 		
 	}
 }

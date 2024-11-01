@@ -22,13 +22,14 @@ struct HomeScreenView: View {
 						Text("Loading Weather Info for Mumbai .... ")
 							.font(.title2)
 							.foregroundStyle(Color.black)
-					}
+					}.accessibilityIdentifier("Loading")
 				} else if !weatherVM.showError {
 					Spacer()
 					WeatherInfoView(temperature: weatherVM.temperature,
 									windDirection: weatherVM.windDirection,
 									region: weatherVM.region,
 									locationName: weatherVM.city)
+					.accessibilityIdentifier("WeatherInfoView")
 					Spacer()
 				}
 				

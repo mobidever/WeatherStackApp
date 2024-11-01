@@ -6,9 +6,11 @@
 //
 
 import XCTest
+@testable import WeatherStackApp
 
 final class WeatherStackAppUITests: XCTestCase {
 
+	let app = XCUIApplication()
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
 
@@ -22,22 +24,38 @@ final class WeatherStackAppUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    @MainActor
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
-        }
-    }
+	/**
+	 Executes the test for given scenario, when the data is successfully loaded.
+	 */
+	func test_HomeScreen_UIElements_Success() throws {
+		app.launchArguments = ["MOCK_VIEWMODEL_DATA_LOADED"]
+		app.launch()
+		let existPredicate = NSPredicate(format: "exists = 1")
+		let weatherInfoElement = app.staticTexts["WeatherInfoView"]
+		let weatherInfoShownExpectation = expectation(for: existPredicate, evaluatedWith: weatherInfoElement)
+		wait(for: [weatherInfoShownExpectation], timeout: 15, enforceOrder: false)
+	}
+	
+	/**
+	 Executes the test for given scenario, when the data is  not successfully loaded and alert is shown to retry.
+	 */
+	func test_HomeScreen_UIElements_Failure() throws {
+		app.launchArguments = ["MOCK_VIEWMODEL_DATA_LOADING_FAILURE"]
+		app.launch()
+		sleep(2)
+		let retryButton = XCUIApplication().alerts["Error"].scrollViews.otherElements.buttons["Retry"]
+		XCTAssert(retryButton.exists)
+		retryButton.tap()
+	}
+	
+	func test_AboutScreen() throws {
+		app.launchArguments = ["MOCK_VIEWMODEL_DATA_LOADED"]
+		app.launch()
+		let tabBar = XCUIApplication().tabBars["Tab Bar"]
+		let infoButton = tabBar.buttons["Info"]
+		infoButton.tap()
+		XCTAssert(app.staticTexts["AppDetailsText"].exists)
+		XCTAssert(app.staticTexts["AppArchitectureText"].exists)
+		
+	}
 }
