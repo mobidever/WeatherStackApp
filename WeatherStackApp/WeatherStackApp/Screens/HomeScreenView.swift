@@ -19,10 +19,12 @@ struct HomeScreenView: View {
 				if weatherVM.isLoading {
 					
 					ProgressView {
-						Text("Loading Weather Info for Mumbai .... ")
+						Text("Loading Weather Info for \(weatherVM.locationRequested) .... ")
 							.font(.title2)
 							.foregroundStyle(Color.black)
-					}.accessibilityIdentifier("Loading")
+					}
+					.accessibilityIdentifier("Loading")
+					
 				} else if !weatherVM.showError {
 					Spacer()
 					WeatherInfoView(temperature: weatherVM.temperature,

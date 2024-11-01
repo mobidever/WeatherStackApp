@@ -29,7 +29,7 @@ enum NetworkError: LocalizedError {
 class HttpClient: NetworkClient {
 	
 	
-	func handleURLResponse(output: URLSession.DataTaskPublisher.Output, url: URL) throws -> Data {
+	private func handleURLResponse(output: URLSession.DataTaskPublisher.Output, url: URL) throws -> Data {
 		
 		guard let response = output.response as? HTTPURLResponse , response.statusCode >= 200 && response.statusCode < 300 else {
 			throw NetworkError.badURLResponse(url: url)
@@ -37,6 +37,9 @@ class HttpClient: NetworkClient {
 		return output.data
 	}
 	
+	/*
+	 Provides publisher to fetch data for a give URL
+	 */
 	func fetchData(from url: URL) -> AnyPublisher<Data, any Error> {
 	
 		return  URLSession.shared.dataTaskPublisher(for: url)

@@ -63,7 +63,7 @@ final class WeatherViewModelTest: XCTestCase {
 		let formattedTemperature = self.weatherVM.temperatureFormatInDegrees(weatherInfo: currentWeatherInfo)
 		XCTAssertEqual(formattedTemperature, "25°C")
 	}
-	
+
 	/*
 	 TestCase : Given Invalid JSON,WeatherViewModel's  weatherPublisher should execute failure case of Sink.
 	 */
@@ -112,7 +112,7 @@ final class WeatherViewModelTest: XCTestCase {
 			let weatherJSON_SuccessData = try Data(contentsOf: self.weatherInfoJSON_SuccessResponseURL!)
 			mockHTTPClient.weatherPublisher = CurrentValueSubject(weatherJSON_SuccessData).eraseToAnyPublisher()
 			
-			//when - Test wewatherPublisher
+			//when - Invoke weatherPublisher
 			weatherVM.weatherPublisher(for: "Hyderabad")
 				.decode(type: WeatherModel.self, decoder: JSONDecoder())
 				.sink { completion in
