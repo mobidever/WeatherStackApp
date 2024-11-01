@@ -21,13 +21,8 @@ class WeatherViewModel : ObservableObject {
 	@Published var errorMessage: String?
 	
 	private var weatherModelCancellable = Set<AnyCancellable>()
-	@Published var searchText = ""
 	private let httpClient: NetworkClient
-	
-//	init() {
-//		self.fetchWeatherInfo()
-//	}
-	
+
 	init(httpClient: NetworkClient){
 		self.httpClient = httpClient
 		
@@ -42,16 +37,16 @@ class WeatherViewModel : ObservableObject {
 	 */
 	func weatherPublisher(for location:String) -> AnyPublisher<Data,Error> {
 		
-		self.httpClient.fetchData(from: Urls.weatherInfoURL(for: "Mumbai"))
+		self.httpClient.fetchData(from: Urls.weatherInfoURL(for: location))
 			.receive(on: RunLoop.main)
 			.eraseToAnyPublisher()
 	}
 
-	func fetchWeatherInfo() {
+	func fetchWeatherInfo(for location:String) {
 
 		self.isLoading = true
 		
-		self.weatherPublisher(for: "Mumbai")
+		self.weatherPublisher(for: location)
 					.decode(type: WeatherModel.self, decoder: JSONDecoder())
 					.sink(receiveCompletion: { [weak self] (completion) in
 						self?.isLoading = false
@@ -76,6 +71,5 @@ class WeatherViewModel : ObservableObject {
 					}).store(in: &weatherModelCancellable)
 		
 	}
-	
 }
 

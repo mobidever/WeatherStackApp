@@ -53,7 +53,17 @@ final class WeatherViewModelTest: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+	/*
+	 TestCase : Given a CurrentWeatherInfo Object, temperature should be string formatted with °C
+	 */
 
+	func test_TemperatureFormat() {
+		
+		let currentWeatherInfo = CurrentWeatherInfo(temperature: 25, wind_dir: "NE", wind_degree: 50)
+		let formattedTemperature = self.weatherVM.temperatureFormatInDegrees(weatherInfo: currentWeatherInfo)
+		XCTAssertEqual(formattedTemperature, "25°C")
+	}
+	
 	/*
 	 TestCase : Given Invalid JSON,WeatherViewModel's  weatherPublisher should execute failure case of Sink.
 	 */
@@ -96,7 +106,7 @@ final class WeatherViewModelTest: XCTestCase {
 	func test_WeatherPublisher_ReceiveValue_Success() throws {
 		
 		let receiveJSON_ReceiveValueExpectation = XCTestExpectation(description: "Expect WeatherPublisher to emit the Valid JSON Response and receiveValue ")
-		let expectationFinished  = XCTestExpectation(description: "Expect WeatherPublisher to emit the Valid JSON Response and Sink Completion Invoked ")
+		
 		do {
 			//given
 			let weatherJSON_SuccessData = try Data(contentsOf: self.weatherInfoJSON_SuccessResponseURL!)
@@ -120,7 +130,8 @@ final class WeatherViewModelTest: XCTestCase {
 					XCTAssertEqual(weatherModel.current.temperature, 28)
 					XCTAssertEqual(weatherModel.current.wind_degree, 122)
 					receiveJSON_ReceiveValueExpectation.fulfill()
-				}.store(in: &weatherModelCancellable)
+				}
+				.store(in: &weatherModelCancellable)
 			wait(for: [receiveJSON_ReceiveValueExpectation], timeout: 5)
 			
 		} catch {

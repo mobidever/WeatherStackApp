@@ -19,7 +19,7 @@ struct HomeScreenView: View {
 				if weatherVM.isLoading {
 					
 					ProgressView {
-						Text("Loading Weather Info .... ")
+						Text("Loading Weather Info for Mumbai .... ")
 							.font(.title2)
 							.foregroundStyle(Color.black)
 					}
@@ -32,12 +32,12 @@ struct HomeScreenView: View {
 					Spacer()
 				}
 				
-			}.onAppear(perform: {
-				self.weatherVM.fetchWeatherInfo()
-			})
+			}.task {
+				self.weatherVM.fetchWeatherInfo(for: "Mumbai")
+			}
 			.alert("Error", isPresented: $weatherVM.showError, presenting: weatherVM.errorMessage) { errorMessage in
 				Button("Retry", role: .cancel) {
-					weatherVM.fetchWeatherInfo()
+					weatherVM.fetchWeatherInfo(for: "Mumbai")
 				
 				}
 			} message: { errorMessage in
