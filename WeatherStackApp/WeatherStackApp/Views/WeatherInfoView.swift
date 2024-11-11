@@ -41,5 +41,5 @@ struct WeatherInfoView: View {
 
 
 #Preview {
-//	WeatherInfoView(temperature: "26", condition: "Haze", region: "India", locationName: "Mumbai")
+	WeatherInfoView(temperature: "26", windDirection: "NS", region: "India", locationName: "Mumbai")
 }
